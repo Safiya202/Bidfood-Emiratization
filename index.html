@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bidfood | Emiratization Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<style>
+:root{
+  --navy:#0a1f44;--navy2:#0f2a5c;--navy3:#15336e;
+  --green:#1e9e5a;--green2:#178049;--green100:#e3f7ec;
+  --orange:#f59e0b;--orange100:#fef3e0;
+  --red:#e53935;--red100:#fdeaea;
+  --gray50:#f4f6f9;--gray100:#eef1f5;--gray200:#e3e8ee;
+  --gray400:#9aa5b1;--gray600:#5b6677;--gray800:#2b3445;
+  --white:#fff;--radius:12px;
+  --shadow:0 1px 3px rgba(15,42,92,.07),0 1px 2px rgba(15,42,92,.09);
+  --shadowM:0 4px 14px rgba(15,42,92,.09);
+  --sw:260px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--gray50);color:var(--gray800);font-size:14px;-webkit-font-smoothing:antialiased;}
+body[data-lang="ar"]{font-family:'Tajawal',sans-serif;}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;cursor:pointer;}
+
+/* SIDEBAR */
+.sidebar{
+  position:fixed;inset-inline-start:0;top:0;bottom:0;width:var(--sw);
+  background:linear-gradient(180deg,var(--navy) 0%,var(--navy2) 100%);
+  color:#cfd9ec;display:flex;flex-direction:column;z-index:1000;
+  transition:transform .25s ease;
+}
+.sb-brand{display:flex;align-items:center;gap:12px;padding:22px 20px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sb-logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green2));
+  display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0;
+  box-shadow:0 4px 10px rgba(30,158,90,.35);}
+.sb-brand h1{font-size:17px;font-weight:800;color:#fff;margin:0;}
+.sb-brand span{font-size:11px;color:#9fb0d6;}
+.sb-nav{flex:1;padding:14px 12px;overflow-y:auto;}
+.nav-lnk{
+  display:flex;align-items:center;gap:12px;padding:11px 14px;margin-bottom:3px;border-radius:9px;
+  color:#b9c5e0;font-size:13.5px;font-weight:500;border:none;background:transparent;
+  width:100%;text-align:start;transition:background .15s,color .15s;position:relative;
+}
+.nav-lnk i{width:18px;text-align:center;font-size:15px;color:#8294bd;}
+.nav-lnk:hover{background:rgba(255,255,255,.06);color:#fff;}
+.nav-lnk:hover i{color:#fff;}
+.nav-lnk.active{background:var(--green);color:#fff;box-shadow:0 4px 12px rgba(30,158,90,.3);}
+.nav-lnk.active i{color:#fff;}
+.nav-div{height:1px;background:rgba(255,255,255,.08);margin:10px 6px;}
+.sb-footer{display:flex;align-items:center;gap:10px;padding:15px 20px;border-top:1px solid rgba(255,255,255,.08);font-size:11px;color:#8294bd;}
+.sb-footer i{font-size:18px;color:var(--green);}
+.sb-footer strong{display:block;color:#dfe7f5;font-size:12px;}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(10,20,50,.5);z-index:999;}
+
+/* MAIN */
+.main{margin-inline-start:var(--sw);min-height:100vh;display:flex;flex-direction:column;}
+.topbar{
+  background:var(--white);border-bottom:1px solid var(--gray200);padding:13px 26px;
+  display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:500;
+}
+.tb-title h2{font-size:17px;font-weight:800;margin:0;color:var(--navy);}
+.tb-title p{font-size:12px;color:var(--gray600);margin:1px 0 0;}
+.tb-actions{margin-inline-start:auto;display:flex;align-items:center;gap:12px;}
+.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--gray200);background:var(--white);
+  color:var(--gray600);display:flex;align-items:center;justify-content:center;font-size:15px;position:relative;}
+.icon-btn:hover{background:var(--gray100);}
+.dot{position:absolute;top:7px;inset-inline-end:8px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid #fff;}
+.lang-sw{display:flex;background:var(--gray100);border-radius:9px;padding:3px;}
+.lang-btn{border:none;background:transparent;padding:6px 13px;font-size:12.5px;font-weight:700;border-radius:7px;color:var(--gray600);}
+.lang-btn.active{background:var(--navy);color:#fff;}
+.user-chip{display:flex;align-items:center;gap:10px;padding:5px 10px 5px 5px;border-radius:30px;border:1px solid var(--gray200);cursor:pointer;}
+.user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--navy3),var(--navy));
+  color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.user-meta strong{display:block;font-size:12.5px;color:var(--gray800);}
+.user-meta span{font-size:10.5px;color:var(--gray600);}
+.user-chip>i{font-size:10px;color:var(--gray400);}
+
+/* CONTENT */
+.content{padding:22px 26px;flex:1;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
+.kpi-card{background:var(--white);border-radius:var(--radius);padding:18px;display:flex;align-items:center;
+  gap:14px;box-shadow:var(--shadow);border:1px solid var(--gray200);}
+.kpi-ic{width:46px;height:46px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;}
+.ic-blue{background:linear-gradient(135deg,#3b6fd6,#2950a8);}
+.ic-green{background:linear-gradient(135deg,#22b06b,#178049);}
+.ic-orange{background:linear-gradient(135deg,#f7b733,#e08e0b);}
+.ic-navy{background:linear-gradient(135deg,var(--navy3),var(--navy));}
+.kpi-label{font-size:11px;color:var(--gray600);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+.kpi-card h3{font-size:26px;margin:3px 0 0;font-weight:800;color:var(--gray800);}
+
+/* CARD */
+.card{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray200);box-shadow:var(--shadow);margin-bottom:20px;}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--gray100);}
+.card-head h3{font-size:14.5px;font-weight:700;margin:0;color:var(--navy);display:flex;align-items:center;gap:8px;}
+.card-head h3 i{color:var(--green);}
+
+/* FILTERS */
+.filters-card{padding:16px 20px;margin-bottom:20px;}
+.filters-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--gray50);border:1px solid var(--gray200);
+  border-radius:9px;padding:9px 14px;flex:1;min-width:200px;}
+.search-box i{color:var(--gray400);font-size:13px;}
+.search-box input{border:none;background:transparent;outline:none;font-size:13px;width:100%;color:var(--gray800);}
+.f-sel{border:1px solid var(--gray200);background:var(--gray50);border-radius:9px;padding:9px 12px;font-size:13px;
+  color:var(--gray800);min-width:150px;outline:none;}
+.btn-reset{display:flex;align-items:center;gap:6px;background:var(--gray100);border:1px solid var(--gray200);
+  border-radius:9px;padding:9px 14px;font-size:12.5px;font-weight:600;color:var(--gray600);}
+.btn-reset:hover{background:var(--gray200);}
+
+/* TABLE */
+.table-card{padding:0;}
+.table-card .card-head{padding:16px 20px;}
+.th-actions{display:flex;align-items:center;gap:14px;}
+.rec-count{font-size:12px;color:var(--gray600);font-weight:600;}
+.exp-wrap{position:relative;}
+.btn-export{display:flex;align-items:center;gap:8px;background:var(--green);color:#fff;border:none;
+  border-radius:9px;padding:9px 16px;font-size:12.5px;font-weight:700;box-shadow:0 3px 8px rgba(30,158,90,.3);}
+.btn-export:hover{background:var(--green2);}
+.exp-menu{position:absolute;inset-inline-end:0;top:44px;background:#fff;border:1px solid var(--gray200);
+  border-radius:10px;box-shadow:var(--shadowM);display:none;flex-direction:column;min-width:170px;z-index:400;overflow:hidden;}
+.exp-menu.open{display:flex;}
+.exp-menu button{border:none;background:transparent;padding:11px 16px;font-size:12.5px;text-align:start;
+  display:flex;align-items:center;gap:10px;color:var(--gray800);}
+.exp-menu button:hover{background:var(--gray50);}
+.exp-menu i{width:16px;color:var(--green);}
+.tbl-wrap{overflow-x:auto;}
+.emp-tbl{width:100%;border-collapse:collapse;min-width:900px;}
+.emp-tbl thead th{background:var(--navy);color:#dfe7f5;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.4px;padding:12px 16px;text-align:start;white-space:nowrap;}
+.emp-tbl tbody td{padding:12px 16px;border-bottom:1px solid var(--gray100);font-size:12.5px;color:var(--gray800);
+  white-space:nowrap;vertical-align:middle;}
+.emp-tbl tbody tr:hover{background:var(--gray50);}
+.emp-name-cell{display:flex;align-items:center;gap:10px;}
+.emp-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--navy3),var(--navy2));
+  color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.status-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+.pill-Completed{background:var(--green100);color:var(--green2);}
+.pill-Pending{background:var(--orange100);color:#b06b06;}
+.pill-Inactive{background:var(--gray100);color:var(--gray600);}
+.status-pill i{font-size:9px;}
+.row-act button{width:30px;height:30px;border-radius:8px;border:1px solid var(--gray200);background:var(--white);
+  color:var(--gray600);font-size:12px;}
+.row-act button:hover{background:var(--gray100);color:var(--navy);}
+.empty{padding:50px;text-align:center;color:var(--gray400);}
+.empty i{font-size:34px;display:block;margin-bottom:8px;}
+
+/* BOTTOM GRID */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;}
+.bottom-grid .card{margin-bottom:0;}
+.alerts-list{padding:6px 14px 14px;max-height:300px;overflow-y:auto;}
+.al-item{display:flex;gap:10px;padding:11px 8px;border-bottom:1px solid var(--gray100);align-items:flex-start;}
+.al-item:last-child{border-bottom:none;}
+.al-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0;}
+.al-warn{background:var(--orange);}
+.al-info{background:var(--navy3);}
+.al-text strong{display:block;font-size:12.5px;color:var(--gray800);}
+.al-text span{font-size:11.5px;color:var(--gray600);}
+.chart-wrap{padding:10px 18px 20px;height:280px;}
+.co-list{padding:10px 18px;display:flex;flex-direction:column;gap:9px;}
+.co-list li{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;
+  background:var(--gray50);border:1px solid var(--gray200);border-radius:9px;font-size:12.5px;font-weight:600;}
+.co-badge{background:var(--navy);color:#fff;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;}
+.bayzat-lnk{display:flex;align-items:center;justify-content:center;gap:8px;margin:4px 18px 18px;
+  background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;padding:11px;border-radius:9px;
+  font-size:12.5px;font-weight:700;box-shadow:0 4px 10px rgba(30,158,90,.3);}
+.bayzat-lnk:hover{filter:brightness(1.07);}
+
+.page-footer{text-align:center;padding:14px;font-size:11.5px;color:var(--gray400);border-top:1px solid var(--gray200);background:var(--white);}
+
+/* MODAL */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(10,20,50,.55);z-index:2000;align-items:center;justify-content:center;padding:20px;}
+.modal-ov.open{display:flex;}
+.modal-box{background:#fff;border-radius:14px;max-width:500px;width:100%;padding:26px;position:relative;max-height:88vh;overflow-y:auto;}
+.modal-close{position:absolute;top:14px;inset-inline-end:14px;width:32px;height:32px;border-radius:8px;border:1px solid var(--gray200);background:var(--gray50);color:var(--gray600);}
+.m-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.m-av{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--navy3),var(--navy));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;}
+.m-head h3{margin:0;font-size:16px;color:var(--navy);}
+.m-head span{font-size:12px;color:var(--gray600);}
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.m-field{background:var(--gray50);border-radius:9px;padding:10px 12px;}
+.m-field label{display:block;font-size:10.5px;color:var(--gray600);font-weight:700;text-transform:uppercase;margin-bottom:3px;}
+.m-field span{font-size:13px;color:var(--gray800);font-weight:600;}
+
+/* EDIT MODAL */
+.edit-field{display:flex;flex-direction:column;gap:6px;}
+.edit-field label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--gray600);}
+.edit-input{
+  border:1px solid var(--gray200);border-radius:9px;padding:10px 13px;font-size:13.5px;
+  color:var(--gray800);outline:none;font-family:inherit;background:var(--gray50);
+  transition:border-color .15s,box-shadow .15s;
+}
+.edit-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,158,90,.12);background:#fff;}
+.status-radio-group{display:flex;gap:8px;}
+.status-radio{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 6px;border-radius:10px;border:2px solid var(--gray200);
+  background:var(--gray50);font-size:12.5px;font-weight:600;color:var(--gray600);
+  transition:all .15s;cursor:pointer;
+}
+.status-radio:hover{border-color:var(--gray400);}
+.status-radio.selected-Completed{border-color:var(--green);background:var(--green100);color:var(--green2);}
+.status-radio.selected-Pending{border-color:var(--orange);background:var(--orange100);color:#b06b06;}
+.status-radio.selected-Inactive{border-color:var(--gray400);background:var(--gray100);color:var(--gray600);}
+.btn-save{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--green);color:#fff;border:none;border-radius:10px;padding:12px;
+  font-size:13.5px;font-weight:700;box-shadow:0 4px 12px rgba(30,158,90,.3);
+  transition:background .15s;
+}
+.btn-save:hover{background:var(--green2);}
+.btn-cancel{
+  padding:12px 20px;border-radius:10px;border:1px solid var(--gray200);
+  background:var(--gray50);color:var(--gray600);font-size:13px;font-weight:600;
+}
+.btn-cancel:hover{background:var(--gray200);}
+.btn-edit-row{background:rgba(30,158,90,.1) !important;color:var(--green) !important;border-color:rgba(30,158,90,.3) !important;}
+.btn-edit-row:hover{background:rgba(30,158,90,.2) !important;}
+.toast-stack{position:fixed;bottom:20px;inset-inline-end:20px;z-index:3000;display:flex;flex-direction:column;gap:10px;}
+.toast-item{background:var(--navy);color:#fff;padding:13px 18px;border-radius:10px;font-size:12.5px;font-weight:600;
+  box-shadow:var(--shadowM);display:flex;align-items:center;gap:10px;min-width:240px;animation:slideIn .25s ease;}
+.toast-item.error{background:var(--red);}
+.toast-item.success i{color:var(--green);}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* DROPDOWN NOTIF */
+.notif-wrap{position:relative;}
+.notif-panel{position:absolute;inset-inline-end:0;top:46px;width:290px;background:#fff;border-radius:12px;
+  box-shadow:var(--shadowM);border:1px solid var(--gray200);display:none;z-index:600;max-height:300px;overflow-y:auto;}
+.notif-panel.open{display:block;}
+.notif-item{padding:11px 14px;border-bottom:1px solid var(--gray100);font-size:12.5px;}
+.notif-item:last-child{border-bottom:none;}
+.notif-item strong{display:block;color:var(--gray800);margin-bottom:2px;}
+.notif-item span{color:var(--gray600);}
+
+/* RTL */
+html[dir="rtl"] .sidebar{inset-inline-start:auto;inset-inline-end:0;}
+html[dir="rtl"] .main{margin-inline-start:0;margin-inline-end:var(--sw);}
+
+/* RESPONSIVE */
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.bottom-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:992px){
+  .sidebar{transform:translateX(-100%);}
+  html[dir="rtl"] .sidebar{transform:translateX(100%);}
+  .sidebar.open{transform:translateX(0);}
+  .sb-overlay.open{display:block;}
+  .main{margin-inline-start:0;margin-inline-end:0;}
+  .bottom-grid{grid-template-columns:1fr;}
+}
+@media(max-width:700px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .content{padding:14px;}
+  .filters-row{flex-direction:column;align-items:stretch;}
+  .f-sel,.search-box{min-width:unset;width:100%;}
+  .topbar{padding:11px 14px;}
+  .user-meta{display:none;}
+  .tb-title p{display:none;}
+}
+@media(max-width:440px){.kpi-grid{grid-template-columns:1fr;}.m-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="fa-solid fa-leaf"></i></div>
+    <div>
+      <h1>Bidfood</h1>
+      <span data-i18n="brandSub">Emiratization Tracker</span>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <a href="#" class="nav-lnk active" data-sec="dashboard"><i class="fa-solid fa-grip"></i><span data-i18n="navDashboard">Dashboard</span></a>
+    <a href="#" class="nav-lnk" data-sec="employees"><i class="fa-solid fa-users"></i><span data-i18n="navEmployees">Employees</span></a>
+    <a href="#" class="nav-lnk" data-sec="reports"><i class="fa-solid fa-chart-column"></i><span data-i18n="navReports">Reports</span></a>
+    <a href="#" class="nav-lnk" data-sec="alerts"><i class="fa-solid fa-bell"></i><span data-i18n="navAlerts">Alerts</span></a>
+    <div class="nav-div"></div>
+    <button class="nav-lnk" id="uploadBtn"><i class="fa-solid fa-file-arrow-up"></i><span data-i18n="navUpload">Upload Excel</span></button>
+    <button class="nav-lnk" id="exportSideBtn"><i class="fa-solid fa-file-arrow-down"></i><span data-i18n="navExport">Export Data</span></button>
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+    <div class="nav-div"></div>
+    <a href="#" class="nav-lnk" data-sec="settings"><i class="fa-solid fa-gear"></i><span data-i18n="navSettings">Settings</span></a>
+    <a href="#" class="nav-lnk" data-sec="help"><i class="fa-solid fa-circle-question"></i><span data-i18n="navHelp">Help</span></a>
+  </nav>
+  <div class="sb-footer">
+    <i class="fa-solid fa-shield-halved"></i>
+    <div><strong data-i18n="footerTitle">MOHRE Compliance</strong><span data-i18n="footerVer">System v1.0</span></div>
+  </div>
+</aside>
+<div class="sb-overlay" id="sbOverlay"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="icon-btn d-lg-none" id="menuBtn"><i class="fa-solid fa-bars"></i></button>
+    <div class="tb-title">
+      <h2 data-i18n="pageTitle">Emiratization Tracking</h2>
+      <p data-i18n="pageSub">MOHRE Compliance · Bidfood Group</p>
+    </div>
+    <div class="tb-actions">
+      <div class="lang-sw">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="ar">عربي</button>
+      </div>
+      <div class="notif-wrap">
+        <button class="icon-btn" id="notifBtn"><i class="fa-regular fa-bell"></i><span class="dot"></span></button>
+        <div class="notif-panel" id="notifPanel"></div>
+      </div>
+      <div class="user-chip">
+        <div class="user-av">PC</div>
+        <div class="user-meta">
+          <strong>People &amp; Culture</strong>
+          <span data-i18n="userRole">HR Administrator</span>
+        </div>
+        <i class="fa-solid fa-chevron-down"></i>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-ic ic-blue"><i class="fa-solid fa-users"></i></div>
+        <div><div class="kpi-label" data-i18n="kpiTotal">Total Employees</div><h3 id="kpiTotal">0</h3></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-ic ic-green"><i class="fa-solid fa-circle-check"></i></div>
+        <div><div class="kpi-label" data-i18n="kpiCompleted">Completed 6 Months</div><h3 id="kpiCompleted">0</h3></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-ic ic-orange"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div><div class="kpi-label" data-i18n="kpiRemaining">Remaining</div><h3 id="kpiRemaining">0</h3></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-ic ic-navy"><i class="fa-solid fa-percent"></i></div>
+        <div><div class="kpi-label" data-i18n="kpiRate">Completion Rate</div><h3 id="kpiRate">0%</h3></div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="card filters-card">
+      <div class="filters-row">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="searchInp" placeholder="Search employee name..." data-i18n-ph="searchPh">
+        </div>
+        <select id="deptFilter" class="f-sel"><option value="" data-i18n="allDept">All Departments</option></select>
+        <select id="statusFilter" class="f-sel">
+          <option value="" data-i18n="allStatus">All Status</option>
+          <option value="Completed" data-i18n="stCompleted">Completed</option>
+          <option value="Pending" data-i18n="stPending">Pending</option>
+          <option value="Inactive" data-i18n="stInactive">Inactive</option>
+        </select>
+        <select id="companyFilter" class="f-sel"><option value="" data-i18n="allCompany">All Companies</option></select>
+        <button class="btn-reset" id="resetBtn"><i class="fa-solid fa-rotate-left"></i> <span data-i18n="reset">Reset</span></button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card table-card">
+      <div class="card-head">
+        <h3><i class="fa-solid fa-table"></i> <span data-i18n="tableTitle">Employee Records</span></h3>
+        <div class="th-actions">
+          <span class="rec-count" id="recCount"></span>
+          <div class="exp-wrap">
+            <button class="btn-export" id="exportBtn"><i class="fa-solid fa-download"></i> <span data-i18n="exportBtn">Export</span></button>
+            <div class="exp-menu" id="expMenu">
+              <button data-fmt="xlsx"><i class="fa-solid fa-file-excel"></i> Excel (.xlsx)</button>
+              <button data-fmt="csv"><i class="fa-solid fa-file-csv"></i> CSV (.csv)</button>
+              <button data-fmt="pdf"><i class="fa-solid fa-file-pdf"></i> PDF (.pdf)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="emp-tbl">
+          <thead>
+            <tr>
+              <th data-i18n="thName">Employee Name</th>
+              <th data-i18n="thCompany">Company</th>
+              <th data-i18n="thDept">Department</th>
+              <th data-i18n="thEid">Emirates ID</th>
+              <th data-i18n="thContact">Contact Number</th>
+              <th data-i18n="thHiring">Hiring Date</th>
+              <th data-i18n="thCompletion">6M Completion</th>
+              <th data-i18n="thStatus">Status</th>
+              <th data-i18n="thActions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tblBody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="emptyState" style="display:none;">
+        <i class="fa-solid fa-inbox"></i>
+        <p data-i18n="noResults">No matching employees found</p>
+      </div>
+    </div>
+
+    <!-- BOTTOM -->
+    <div class="bottom-grid">
+      <div class="card">
+        <div class="card-head"><h3><i class="fa-solid fa-bell"></i> <span data-i18n="alertsTitle">Alerts</span></h3></div>
+        <div class="alerts-list" id="alertsList"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3><i class="fa-solid fa-chart-pie"></i> <span data-i18n="chartTitle">Status Overview</span></h3></div>
+        <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3><i class="fa-solid fa-building"></i> <span data-i18n="companiesTitle">UAE Companies</span></h3></div>
+        <ul class="co-list" id="coList"></ul>
+        <a href="https://app.bayzat.com/enterprise/dashboard/home" target="_blank" rel="noopener noreferrer" class="bayzat-lnk" onclick="window.open('https://app.bayzat.com/enterprise/dashboard/home','_blank','noopener,noreferrer');return false;">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> <span data-i18n="bayzatLink">Open Bayzat Dashboard</span>
+        </a>
+      </div>
+    </div>
+
+  </main>
+  <footer class="page-footer">© 2026 Bidfood Group — <span data-i18n="footerText">Emiratization Tracking System</span></footer>
+</div>
+
+<!-- VIEW MODAL -->
+<div class="modal-ov" id="modal">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-ov" id="editModal">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" id="editModalClose"><i class="fa-solid fa-xmark"></i></button>
+    <div class="m-head">
+      <div class="m-av" id="editAv"></div>
+      <div><h3 id="editName" style="font-size:15px;margin:0;color:var(--navy)"></h3><span id="editSub" style="font-size:12px;color:var(--gray600)"></span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="edit-field">
+        <label data-i18n="thStatus">Status</label>
+        <div class="status-radio-group" id="statusRadioGroup">
+          <button type="button" class="status-radio" data-val="Completed">
+            <i class="fa-solid fa-circle-check"></i> <span data-i18n="stCompleted">Completed</span>
+          </button>
+          <button type="button" class="status-radio" data-val="Pending">
+            <i class="fa-solid fa-clock"></i> <span data-i18n="stPending">Pending</span>
+          </button>
+          <button type="button" class="status-radio" data-val="Inactive">
+            <i class="fa-solid fa-circle-minus"></i> <span data-i18n="stInactive">Inactive</span>
+          </button>
+        </div>
+      </div>
+      <div class="edit-field">
+        <label data-i18n="thEid">Emirates ID</label>
+        <input type="text" id="editEid" class="edit-input" placeholder="784...">
+      </div>
+      <div class="edit-field">
+        <label data-i18n="thContact">Contact Number</label>
+        <input type="text" id="editContact" class="edit-input" placeholder="971...">
+      </div>
+      <div class="edit-field">
+        <label data-i18n="thHiring">Hiring Date</label>
+        <input type="date" id="editHiring" class="edit-input">
+      </div>
+      <div class="edit-field">
+        <label data-i18n="thCompletion">6M Completion Date</label>
+        <input type="date" id="editCompletion" class="edit-input">
+      </div>
+      <div style="display:flex;gap:10px;margin-top:6px">
+        <button class="btn-save" id="saveEditBtn"><i class="fa-solid fa-floppy-disk"></i> <span data-i18n="saveBtn">Save Changes</span></button>
+        <button class="btn-cancel" id="cancelEditBtn"><span data-i18n="cancelBtn">Cancel</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toasts"></div>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+<script>
+const EMPLOYEE_DATA = [{"sn": 1, "name": "ALANOUD ALKETBI", "company": "Horeca - Main", "hiringDate": "2025-01-13", "department": "Marketing", "position": "Brand & Marketing Associate", "contact": "971503488451", "eid": "784200351506272", "email": "alanoud.ali@bidfoodme.com", "completionDate": "2025-07-13", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": []}, {"sn": 2, "name": "Alyazyia Alketbi", "company": "Horeca - Main", "hiringDate": "2024-06-24", "department": "Jahez", "position": "Learning & Development", "contact": "971563606155", "eid": "784200319532717", "email": "alyazyia.alketbi@bidfoodme.com", "completionDate": "2024-12-24", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Pending", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": ["Labor Card"]}, {"sn": 3, "name": "Amna Alshagga", "company": "Horeca - Main", "hiringDate": "2024-12-24", "department": "Jahez", "position": "Customer Services", "contact": "971561188222", "eid": "784199532482140", "email": "amna.alshagga@bidfoodme.com", "completionDate": "2025-06-24", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": []}, {"sn": 4, "name": "Ayesha Almehairbi", "company": "Horeca - Main", "hiringDate": "2024-07-01", "department": "People & Culture", "position": "Emiratization Specialist", "contact": "971505038339", "eid": "784199528062062", "email": "ayesha.a@bidfoodme.com", "completionDate": "2025-01-01", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": []}, {"sn": 5, "name": "ABDULLA ALABED ALDARMAKI", "company": "Horeca - Main", "hiringDate": "2026-02-03", "department": "Jahez", "position": "Sales Co-ordinator", "contact": "971567597554", "eid": "784200160352637", "email": "abdulla.a@bidfoodme.com", "completionDate": "", "status": "Inactive", "statusLabel": "Inactive", "docs": {"EID": "Missing", "Labor Card": "Missing", "Job Description": "Missing", "Bayzat Salaries": "Missing", "Pension": "Missing"}, "missing": ["EID", "Labor Card", "Job Description", "Bayzat Salaries", "Pension"]}, {"sn": 6, "name": "Abdurahman Ali Alblooshi", "company": "Horeca - Main", "hiringDate": "Resignation", "department": "Jahez", "position": "Finance Cost&Pricing", "contact": "971522286383", "eid": "784200186580708", "email": "abdurahman.ali@bidfoodme.com", "completionDate": "", "status": "Inactive", "statusLabel": "Inactive", "docs": {"EID": "Missing", "Labor Card": "Missing", "Job Description": "Missing", "Bayzat Salaries": "Missing", "Pension": "Missing"}, "missing": ["EID", "Labor Card", "Job Description", "Bayzat Salaries", "Pension"]}, {"sn": 7, "name": "Fatima Alfarasy", "company": "Horeca - Main", "hiringDate": "2024-06-24", "department": "Jahez", "position": "Employee Engagment", "contact": "971501780819", "eid": "784199816416483", "email": "fatima.alfarsi@bidfoodme.com", "completionDate": "2024-12-24", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Missing"}, "missing": ["Pension"]}, {"sn": 8, "name": "Hmouda Alqemzi", "company": "Horeca - Main", "hiringDate": "2022-07-01", "department": "Finance", "position": "Collector", "contact": "971569969329", "eid": "784197384195752", "email": "hmouda.futurevision@gmail.com", "completionDate": "2023-01-01", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": []}, {"sn": 9, "name": "HUSAIN ALSHERAIFI ALMESSABI", "company": "Horeca - Main", "hiringDate": "2025-02-03", "department": "Jahez", "position": "Public Relation Officer", "contact": "971562344233", "eid": "784200068703287", "email": "hussain.abdullah@bidfoodme.com", "completionDate": "2025-08-03", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Missing", "Pension": "Completed"}, "missing": ["Bayzat Salaries"]}, {"sn": 10, "name": "LAILA ALHAMIMI", "company": "Horeca - Main", "hiringDate": "2025-09-29", "department": "Jahez", "position": "People & Culture", "contact": "971508123322", "eid": "784198605409857", "email": "laila.s@bidfoodme.com", "completionDate": "2026-03-29", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Pending", "Pension": "Completed"}, "missing": ["Bayzat Salaries"]}, {"sn": 11, "name": "SALAMA OBAID ALSHAMSI", "company": "Horeca - Main", "hiringDate": "2025-09-29", "department": "Jahez", "position": "Learning & Development", "contact": "971556632659", "eid": "784200629209279", "email": "salama.b@bidfoodme.com", "completionDate": "2026-03-29", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": []}, {"sn": 12, "name": "Noora Alketbi", "company": "Horeca - Main", "hiringDate": "2024-06-24", "department": "Marketing", "position": "MyBidfood Support Executive", "contact": "971569299073", "eid": "784200252031032", "email": "nora.alketbi@bidfoodme.com", "completionDate": "2024-12-24", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": []}, {"sn": 13, "name": "REEM SHAHWAN ALDHAHERI", "company": "Horeca - Main", "hiringDate": "Resignation", "department": "Jahez", "position": "Marketing", "contact": "971554477085", "eid": "784200193848593", "email": "reem.arar@bidfoodme.com", "completionDate": "", "status": "Inactive", "statusLabel": "Inactive", "docs": {"EID": "Missing", "Labor Card": "Missing", "Job Description": "Missing", "Bayzat Salaries": "Missing", "Pension": "Missing"}, "missing": ["EID", "Labor Card", "Job Description", "Bayzat Salaries", "Pension"]}, {"sn": 14, "name": "Safeyya  AlSharji", "company": "Horeca - Main", "hiringDate": "2024-07-22", "department": "People & Culture", "position": "Emiratization Specialist", "contact": "971527505008", "eid": "784198769525282", "email": "safeyya.musallem@bidfoodme.com", "completionDate": "2025-01-22", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Pending", "Pension": "Completed"}, "missing": ["Bayzat Salaries"]}, {"sn": 15, "name": "SHAYMAA JABER ALHAMMADI", "company": "Horeca - Main", "hiringDate": "2025-10-28", "department": "Jahez", "position": "Supply Chain", "contact": "971525640907", "eid": "784200193806823", "email": "shayma.jasem@bidfoodme.com", "completionDate": "2026-04-28", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": []}, {"sn": 16, "name": "Tebah Alshagga", "company": "Horeca - Main", "hiringDate": "2024-09-11", "department": "Jahez", "position": "Customer Services", "contact": "971521856660", "eid": "784200448408367", "email": "tebah.salem@bidfoodme.com", "completionDate": "2025-03-11", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Missing", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": ["EID"]}, {"sn": 17, "name": "Noora Waleed Al Mehairbi", "company": "Horeca - Main", "hiringDate": "2026-06-02", "department": "Jahez", "position": "Bidfood - Warehouse Supervisor", "contact": "971526654997", "eid": "784200369098379", "email": "noora.waleed@bidfoodme.com", "completionDate": "2026-12-02", "status": "Pending", "statusLabel": "155 Days Remaining", "docs": {"EID": "Missing", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": ["EID"]}, {"sn": 18, "name": "Nouf Alameri", "company": "Horeca - Main", "hiringDate": "2026-06-08", "department": "Jahez", "position": "-", "contact": "971569996662", "eid": "784199535921318", "email": "nouf.omran@bidfoodme.com", "completionDate": "2026-12-08", "status": "Pending", "statusLabel": "161 Days Remaining", "docs": {"EID": "Completed", "Labor Card": "Missing", "Job Description": "Missing", "Bayzat Salaries": "Completed", "Pension": "Pending"}, "missing": ["Labor Card", "Job Description", "Pension"]}, {"sn": 19, "name": "Samra Abdulhakeem  Mohamed", "company": "Horeca - Main", "hiringDate": "2026-06-22", "department": "Sales", "position": "Business Development Executive", "contact": "917528140447", "eid": "784199343030278", "email": "samra.mohamed@bidfoodme.com", "completionDate": "2026-12-22", "status": "Pending", "statusLabel": "175 Days Remaining", "docs": {"EID": "Completed", "Labor Card": "Missing", "Job Description": "Pending", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": ["Labor Card", "Job Description"]}, {"sn": 20, "name": "Asmaa Alsaadi", "company": "Horeca - Main", "hiringDate": "2026-06-22", "department": "People & Culture", "position": "PRO", "contact": "971557305060", "eid": "", "email": "Asmaa.alsaadi@bidfoodme.com", "completionDate": "2026-12-22", "status": "Pending", "statusLabel": "175 Days Remaining", "docs": {"EID": "Pending", "Labor Card": "Completed", "Job Description": "Pending", "Bayzat Salaries": "Missing", "Pension": "Completed"}, "missing": ["EID", "Job Description", "Bayzat Salaries"]}, {"sn": 21, "name": "wadeema Alhosani", "company": "Horeca - Main", "hiringDate": "2026-06-23", "department": "Jahez", "position": "Logistics and Operations.", "contact": "971569655554", "eid": "784200542064876", "email": "wadeema.ibrahim@bidfoodme.com", "completionDate": "2026-12-23", "status": "Pending", "statusLabel": "176 Days Remaining", "docs": {"EID": "Completed", "Labor Card": "Missing", "Job Description": "Pending", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": ["Labor Card", "Job Description"]}, {"sn": 22, "name": "Badreyya Alshehhi", "company": "Horeca - Branch", "hiringDate": "2026-06-23", "department": "Jahez", "position": "Reception", "contact": "971501131346", "eid": "784199653702938", "email": "badreyya.abdulla@bidfoodme.com", "completionDate": "2026-12-23", "status": "Pending", "statusLabel": "176 Days Remaining", "docs": {"EID": "Completed", "Labor Card": "Pending", "Job Description": "Missing", "Bayzat Salaries": "Pending", "Pension": "Completed"}, "missing": ["Labor Card", "Job Description", "Bayzat Salaries"]}, {"sn": 23, "name": "AMNA MOHAMMED ALBLOOSHI", "company": "Horeca - Branch", "hiringDate": "2025-07-08", "department": "Jahez", "position": "Talent Acquisition", "contact": "971561199941", "eid": "784199179580511", "email": "amna.alblooshi@bidfoodme.com", "completionDate": "2026-01-08", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Missing", "Job Description": "Completed", "Bayzat Salaries": "Missing", "Pension": "Pending"}, "missing": ["Labor Card", "Bayzat Salaries", "Pension"]}, {"sn": 24, "name": "Anood Yousuf Alawadhi", "company": "Horeca - Branch", "hiringDate": "2026-03-30", "department": "Jahez", "position": "Public Relation Officer", "contact": "971543387778", "eid": "784200240837516", "email": "anood.yousuf@bidfoodme.com", "completionDate": "2026-09-30", "status": "Pending", "statusLabel": "92 Days Remaining", "docs": {"EID": "Completed", "Labor Card": "Pending", "Job Description": "Pending", "Bayzat Salaries": "Pending", "Pension": "Completed"}, "missing": ["Labor Card", "Job Description", "Bayzat Salaries"]}, {"sn": 25, "name": "MAITHA ALDHAHERI", "company": "Horeca - Branch", "hiringDate": "2024-10-14", "department": "Jahez", "position": "Quality Anssurance", "contact": "971545557561", "eid": "784200106483983", "email": "maitha.a@bidfoodme.com", "completionDate": "2025-04-14", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Missing"}, "missing": ["Pension"]}, {"sn": 26, "name": "MANAL BIN HAMOUDESH ALHADHRAMI", "company": "Horeca - Branch", "hiringDate": "2025-04-14", "department": "Jahez", "position": "Employee Engagment", "contact": "971526678855", "eid": "784199818749071", "email": "manal.saleh@bidfoodme.com", "completionDate": "2025-10-14", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Pending", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Pending"}, "missing": ["EID", "Pension"]}, {"sn": 27, "name": "FATIMA ARAR ALDHAHERI", "company": "Horeca - Branch", "hiringDate": "2025-10-14", "department": "Jahez", "position": "Talent Acquisition", "contact": "971568888477", "eid": "784199538091853", "email": "fatima.Aldhaheri@bidfoodme.com", "completionDate": "2026-04-14", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Pending", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": ["EID"]}, {"sn": 28, "name": "FATIMA ABDULLA ALHOSANI", "company": "Horeca - Branch", "hiringDate": "2025-10-14", "department": "Jahez", "position": "Learning & Development", "contact": "971554911992", "eid": "784199809437942", "email": "fatima.a@bidfoodme.com", "completionDate": "2026-04-14", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": []}, {"sn": 29, "name": "Samaha Alhadhrami", "company": "Horeca - Branch", "hiringDate": "2026-02-03", "department": "Jahez", "position": "Finance Admin", "contact": "971564632339", "eid": "784199597628389", "email": "samaha.m@bidfoodme.com", "completionDate": "2026-08-03", "status": "Pending", "statusLabel": "34 Days Remaining", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Missing", "Bayzat Salaries": "Missing", "Pension": "Missing"}, "missing": ["Job Description", "Bayzat Salaries", "Pension"]}, {"sn": 30, "name": "Saeeda Almansoori", "company": "Horeca - Branch", "hiringDate": "2024-01-29", "department": "Finance", "position": "Collector/PRO", "contact": "971581905448", "eid": "784199042810822", "email": "saeeda.a@bidfoodme.com", "completionDate": "2024-07-29", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Pending", "Bayzat Salaries": "Pending", "Pension": "Completed"}, "missing": ["Job Description", "Bayzat Salaries"]}, {"sn": 31, "name": "SARA SAED ALKAABI", "company": "Wet Fish", "hiringDate": "2025-03-03", "department": "Jahez", "position": "Quality Anssurance", "contact": "971555055334", "eid": "784200083202422", "email": "sara.khalifa@bidfoodme.com", "completionDate": "2025-09-03", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Completed", "Pension": "Completed"}, "missing": []}, {"sn": 32, "name": "NOURA ALMANSOORI", "company": "Wet Fish", "hiringDate": "2024-06-24", "department": "Jahez", "position": "Sales Co-ordinator", "contact": "971588164440", "eid": "784200176487971", "email": "noura.saleh@bidfoodme.com", "completionDate": "2024-12-24", "status": "Completed", "statusLabel": "✓ Completed 6 Months", "docs": {"EID": "Completed", "Labor Card": "Completed", "Job Description": "Completed", "Bayzat Salaries": "Pending", "Pension": "Completed"}, "missing": ["Bayzat Salaries"]}];
+
+const I18N = {
+  en:{
+    brandSub:"Emiratization Tracker",navDashboard:"Dashboard",navEmployees:"Employees",
+    navReports:"Reports",navAlerts:"Alerts",navUpload:"Upload Excel",navExport:"Export Data",
+    navSettings:"Settings",navHelp:"Help",footerTitle:"MOHRE Compliance",footerVer:"System v1.0",
+    pageTitle:"Emiratization Tracking",pageSub:"MOHRE Compliance · Bidfood Group",
+    userRole:"HR Administrator",
+    kpiTotal:"Total Employees",kpiCompleted:"Completed 6 Months",kpiRemaining:"Remaining",kpiRate:"Completion Rate",
+    searchPh:"Search employee name...",allDept:"All Departments",allStatus:"All Status",
+    allCompany:"All Companies",stCompleted:"Completed",stPending:"Pending",stInactive:"Inactive",
+    reset:"Reset",tableTitle:"Employee Records",exportBtn:"Export",
+    thName:"Employee Name",thCompany:"Company",thDept:"Department",thEid:"Emirates ID",
+    thContact:"Contact Number",thHiring:"Hiring Date",thCompletion:"6M Completion",
+    thStatus:"Status",thActions:"Actions",noResults:"No matching employees found",
+    alertsTitle:"Alerts",chartTitle:"Status Overview",companiesTitle:"UAE Companies",
+    bayzatLink:"Open Bayzat Dashboard",footerText:"Emiratization Tracking System",
+    view:"View",noEid:"Not provided",records:"records",
+    uploadOk:"File uploaded — dashboard updated",uploadErr:"Could not read file",exportOk:"Exported successfully",
+    editBtn:"Edit employee",saveBtn:"Save Changes",cancelBtn:"Cancel",saveOk:"Changes saved successfully"
+  },
+  ar:{
+    brandSub:"متابعة التوطين",navDashboard:"الرئيسية",navEmployees:"الموظفون",
+    navReports:"التقارير",navAlerts:"التنبيهات",navUpload:"رفع ملف إكسل",navExport:"تصدير البيانات",
+    navSettings:"الإعدادات",navHelp:"المساعدة",footerTitle:"الامتثال لوزارة الموارد البشرية",footerVer:"النظام v1.0",
+    pageTitle:"متابعة التوطين",pageSub:"امتثال وزارة الموارد البشرية · مجموعة بيدفود",
+    userRole:"مسؤول الموارد البشرية",
+    kpiTotal:"إجمالي الموظفين",kpiCompleted:"أكملوا 6 أشهر",kpiRemaining:"متبقون",kpiRate:"نسبة الإنجاز",
+    searchPh:"ابحث باسم الموظف...",allDept:"كل الأقسام",allStatus:"كل الحالات",
+    allCompany:"كل الشركات",stCompleted:"مكتمل",stPending:"قيد الانتظار",stInactive:"غير نشط",
+    reset:"إعادة تعيين",tableTitle:"سجلات الموظفين",exportBtn:"تصدير",
+    thName:"اسم الموظف",thCompany:"الشركة",thDept:"القسم",thEid:"الهوية الإماراتية",
+    thContact:"رقم الهاتف",thHiring:"تاريخ التعيين",thCompletion:"استكمال 6 أشهر",
+    thStatus:"الحالة",thActions:"إجراءات",noResults:"لا يوجد موظفون مطابقون",
+    alertsTitle:"التنبيهات",chartTitle:"نظرة عامة على الحالات",companiesTitle:"شركات الإمارات",
+    bayzatLink:"فتح لوحة Bayzat",footerText:"نظام متابعة التوطين",
+    view:"عرض",noEid:"غير متوفر",records:"سجل",
+    uploadOk:"تم رفع الملف وتحديث اللوحة",uploadErr:"تعذرت قراءة الملف",exportOk:"تم التصدير بنجاح",
+    editBtn:"تعديل الموظف",saveBtn:"حفظ التغييرات",cancelBtn:"إلغاء",saveOk:"تم حفظ التغييرات بنجاح"
+  }
+};
+
+let lang = 'en';
+let employees = EMPLOYEE_DATA.slice();
+let chart = null;
+
+const t = k => I18N[lang][k] || k;
+const initials = n => (n||'').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+/* ---- Language ---- */
+function applyLang(l){
+  lang = l;
+  document.documentElement.lang = l;
+  document.documentElement.dir = l==='ar'?'rtl':'ltr';
+  document.body.setAttribute('data-lang',l);
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent=t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder=t(el.getAttribute('data-i18n-ph')); });
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));
+  populateFilters();
+  renderAll();
+}
+
+/* ---- Filters ---- */
+function populateFilters(){
+  const dept = document.getElementById('deptFilter');
+  const dv = dept.value;
+  const depts = [...new Set(employees.map(e=>e.department).filter(Boolean))].sort();
+  dept.innerHTML = `<option value="">${t('allDept')}</option>` + depts.map(d=>`<option value="${d}">${d}</option>`).join('');
+  dept.value = dv;
+
+  const co = document.getElementById('companyFilter');
+  const cv = co.value;
+  const cos = [...new Set(employees.map(e=>e.company).filter(Boolean))].sort();
+  co.innerHTML = `<option value="">${t('allCompany')}</option>` + cos.map(c=>`<option value="${c}">${c}</option>`).join('');
+  co.value = cv;
+}
+
+function getFiltered(){
+  const q = document.getElementById('searchInp').value.trim().toLowerCase();
+  const dept = document.getElementById('deptFilter').value;
+  const status = document.getElementById('statusFilter').value;
+  const company = document.getElementById('companyFilter').value;
+  return employees.filter(e=>{
+    if(q && !e.name.toLowerCase().includes(q)) return false;
+    if(dept && e.department!==dept) return false;
+    if(status && e.status!==status) return false;
+    if(company && e.company!==company) return false;
+    return true;
+  });
+}
+
+/* ---- KPI ---- */
+function renderKPI(){
+  const total = employees.length;
+  const comp = employees.filter(e=>e.status==='Completed').length;
+  const rem = employees.filter(e=>e.status==='Pending').length;
+  const rate = total ? Math.round((comp/total)*100) : 0;
+  document.getElementById('kpiTotal').textContent = total;
+  document.getElementById('kpiCompleted').textContent = comp;
+  document.getElementById('kpiRemaining').textContent = rem;
+  document.getElementById('kpiRate').textContent = rate + '%';
+}
+
+/* ---- Table ---- */
+function renderTable(){
+  const data = getFiltered();
+  const tbody = document.getElementById('tblBody');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('recCount').textContent = `${data.length} ${t('records')}`;
+  if(!data.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  const pillIcon = s => s==='Completed'?'fa-circle-check':s==='Pending'?'fa-clock':'fa-circle-minus';
+  const pillKey  = s => s==='Completed'?'stCompleted':s==='Pending'?'stPending':'stInactive';
+  tbody.innerHTML = data.map(e=>`
+    <tr>
+      <td><div class="emp-name-cell"><div class="emp-av">${initials(e.name)}</div><span>${e.name}</span></div></td>
+      <td>${e.company}</td>
+      <td>${e.department}</td>
+      <td>${e.eid || t('noEid')}</td>
+      <td>${e.contact}</td>
+      <td>${e.hiringDate||'—'}</td>
+      <td>${e.completionDate||'—'}</td>
+      <td><span class="status-pill pill-${e.status}"><i class="fa-solid ${pillIcon(e.status)}"></i>${t(pillKey(e.status))}</span></td>
+      <td><div class="row-act">
+        <button onclick="openModal(${e.sn})" title="${t('view')}"><i class="fa-solid fa-eye"></i></button>
+        <button onclick="openEdit(${e.sn})" title="${t('editBtn')}" class="btn-edit-row"><i class="fa-solid fa-pen-to-square"></i></button>
+      </div></td>
+    </tr>`).join('');
+}
+
+/* ---- Alerts ---- */
+function renderAlerts(){
+  const items = [];
+  employees.filter(e=>e.status==='Pending').slice(0,6).forEach(e=>{
+    items.push({cls:'al-warn',icon:'fa-hourglass-half',name:e.name,text:e.statusLabel});
+  });
+  if(!items.length) items.push({cls:'al-info',icon:'fa-circle-info',name:lang==='ar'?'لا توجد تنبيهات':'No alerts',text:lang==='ar'?'جميع الموظفين أكملوا 6 أشهر':'All employees completed 6 months'});
+  document.getElementById('alertsList').innerHTML = items.map(a=>`
+    <div class="al-item">
+      <div class="al-ic ${a.cls}"><i class="fa-solid ${a.icon}"></i></div>
+      <div class="al-text"><strong>${a.name}</strong><span>${a.text}</span></div>
+    </div>`).join('');
+  // notif panel
+  document.getElementById('notifPanel').innerHTML = items.map(a=>`
+    <div class="notif-item"><strong>${a.name}</strong><span>${a.text}</span></div>`).join('');
+}
+
+/* ---- Chart ---- */
+function renderChart(){
+  const ctx = document.getElementById('statusChart').getContext('2d');
+  const comp = employees.filter(e=>e.status==='Completed').length;
+  const pend = employees.filter(e=>e.status==='Pending').length;
+  const inac = employees.filter(e=>e.status==='Inactive').length;
+  if(chart) chart.destroy();
+  chart = new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:[t('stCompleted'),t('stPending'),t('stInactive')],
+      datasets:[{data:[comp,pend,inac],backgroundColor:['#1e9e5a','#f59e0b','#9aa5b1'],borderWidth:0,hoverOffset:6}]
+    },
+    options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{usePointStyle:true,padding:16,font:{size:12}}}},cutout:'68%'}
+  });
+}
+
+/* ---- Companies ---- */
+function renderCompanies(){
+  const counts = {};
+  employees.forEach(e=>{ counts[e.company]=(counts[e.company]||0)+1; });
+  document.getElementById('coList').innerHTML = Object.entries(counts).map(([n,c])=>`
+    <li><span>${n}</span><span class="co-badge">${c}</span></li>`).join('');
+}
+
+/* ---- Modal ---- */
+function openModal(sn){
+  const e = employees.find(x=>x.sn===sn);
+  if(!e) return;
+  const pillIcon = s => s==='Completed'?'fa-circle-check':s==='Pending'?'fa-clock':'fa-circle-minus';
+  const pillKey  = s => s==='Completed'?'stCompleted':s==='Pending'?'stPending':'stInactive';
+  document.getElementById('modalContent').innerHTML = `
+    <div class="m-head">
+      <div class="m-av">${initials(e.name)}</div>
+      <div><h3>${e.name}</h3><span>${e.department} · ${e.company}</span></div>
+    </div>
+    <div class="m-grid">
+      <div class="m-field"><label>${t('thEid')}</label><span>${e.eid||t('noEid')}</span></div>
+      <div class="m-field"><label>${t('thContact')}</label><span>${e.contact||'—'}</span></div>
+      <div class="m-field"><label>${t('thHiring')}</label><span>${e.hiringDate||'—'}</span></div>
+      <div class="m-field"><label>${t('thCompletion')}</label><span>${e.completionDate||'—'}</span></div>
+      <div class="m-field" style="grid-column:1/-1"><label>${t('thStatus')}</label>
+        <span class="status-pill pill-${e.status}" style="display:inline-flex;margin-top:4px">
+          <i class="fa-solid ${pillIcon(e.status)}"></i>${t(pillKey(e.status))} — ${e.statusLabel}
+        </span>
+      </div>
+    </div>`;
+  document.getElementById('modal').classList.add('open');
+}
+document.getElementById('modalClose').onclick = ()=> document.getElementById('modal').classList.remove('open');
+document.getElementById('modal').onclick = ev=>{ if(ev.target.id==='modal') ev.target.classList.remove('open'); };
+
+/* ---- Master render ---- */
+function renderAll(){
+  renderKPI(); renderTable(); renderAlerts(); renderChart(); renderCompanies();
+}
+
+/* ---- Filter events ---- */
+document.getElementById('searchInp').addEventListener('input', renderTable);
+['deptFilter','statusFilter','companyFilter'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', renderTable);
+});
+document.getElementById('resetBtn').onclick = ()=>{
+  document.getElementById('searchInp').value='';
+  ['deptFilter','statusFilter','companyFilter'].forEach(id=>{ document.getElementById(id).value=''; });
+  renderTable();
+};
+
+/* ---- Nav ---- */
+document.querySelectorAll('.nav-lnk[data-sec]').forEach(lnk=>{
+  lnk.addEventListener('click', ev=>{
+    ev.preventDefault();
+    document.querySelectorAll('.nav-lnk[data-sec]').forEach(l=>l.classList.remove('active'));
+    lnk.classList.add('active');
+    closeSidebar();
+    const sec = lnk.dataset.sec;
+    if(sec==='employees') document.querySelector('.table-card').scrollIntoView({behavior:'smooth'});
+    else if(sec==='alerts') document.querySelector('.alerts-list').closest('.card').scrollIntoView({behavior:'smooth'});
+    else if(sec==='reports') document.querySelector('.chart-wrap').closest('.card').scrollIntoView({behavior:'smooth'});
+    else window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+
+/* ---- Sidebar mobile ---- */
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sbOverlay');
+document.getElementById('menuBtn').onclick = ()=>{ sidebar.classList.add('open'); overlay.classList.add('open'); };
+overlay.onclick = closeSidebar;
+function closeSidebar(){ sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+
+/* ---- Language ---- */
+document.querySelectorAll('.lang-btn').forEach(b=>{ b.onclick=()=>applyLang(b.dataset.lang); });
+
+/* ---- Notifications ---- */
+const notifBtn = document.getElementById('notifBtn');
+const notifPanel = document.getElementById('notifPanel');
+notifBtn.onclick = ev=>{ ev.stopPropagation(); notifPanel.classList.toggle('open'); };
+document.addEventListener('click', ev=>{
+  if(!notifPanel.contains(ev.target)&&ev.target!==notifBtn) notifPanel.classList.remove('open');
+  if(!document.getElementById('expMenu').contains(ev.target)&&ev.target!==document.getElementById('exportBtn'))
+    document.getElementById('expMenu').classList.remove('open');
+});
+
+/* ---- Upload ---- */
+document.getElementById('uploadBtn').onclick = ()=> document.getElementById('fileInput').click();
+document.getElementById('fileInput').addEventListener('change', ev=>{
+  const file = ev.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const wb = XLSX.read(e.target.result,{type:'binary'});
+      const sn = wb.SheetNames.find(n=>/document.*file/i.test(n)) || wb.SheetNames[0];
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn],{defval:''});
+      const parsed = parseRows(rows);
+      if(!parsed.length) throw new Error('empty');
+      employees = parsed;
+      populateFilters(); renderAll();
+      toast(t('uploadOk'));
+    } catch(err){ toast(t('uploadErr'),'error'); }
+  };
+  reader.readAsBinaryString(file);
+  ev.target.value='';
+});
+
+function parseRows(rows){
+  return rows.map((r,i)=>{
+    const g = (...keys)=>{ for(const k of keys){ for(const rk of Object.keys(r)){ if(rk.trim().toLowerCase()===k.toLowerCase()) return r[rk]; } } return ''; };
+    const sr = String(g('Status')||'').trim();
+    const status = /completed/i.test(sr)?'Completed':/inactive/i.test(sr)?'Inactive':'Pending';
+    return { sn:i+1, name:String(g('Employee Name','Name')||'').trim(), company:String(g('Company')||'').trim(),
+      hiringDate:String(g('Hiring Date')||'').trim(), department:String(g('department','Department')||'').trim(),
+      position:String(g('position','Position')||'-').trim(), contact:String(g('contact number','Contact','Contact Number')||'').trim(),
+      eid:String(g('Emirates ID')||'').replace(/'/g,'').trim(), email:String(g('Email','Email ')||'').trim(),
+      completionDate:String(g('6 Months Completion Date')||'').trim(), status, statusLabel:sr||status, docs:{}, missing:[] };
+  }).filter(e=>e.name);
+}
+
+/* ---- Export ---- */
+document.getElementById('exportBtn').onclick = ev=>{ ev.stopPropagation(); document.getElementById('expMenu').classList.toggle('open'); };
+document.getElementById('exportSideBtn').onclick = ()=>{ document.getElementById('expMenu').classList.toggle('open'); };
+document.querySelectorAll('#expMenu button').forEach(b=>{
+  b.onclick=()=>{ const fmt=b.dataset.fmt; exportData(fmt); document.getElementById('expMenu').classList.remove('open'); };
+});
+
+function buildRows(data){
+  return data.map(e=>({
+    [t('thName')]:e.name,[t('thCompany')]:e.company,[t('thDept')]:e.department,
+    [t('thEid')]:e.eid||t('noEid'),[t('thContact')]:e.contact,
+    [t('thHiring')]:e.hiringDate||'—',[t('thCompletion')]:e.completionDate||'—',[t('thStatus')]:e.statusLabel
+  }));
+}
+
+function exportData(fmt){
+  const data = getFiltered();
+  if(fmt==='xlsx'){
+    const ws=XLSX.utils.json_to_sheet(buildRows(data));
+    const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Employees');
+    XLSX.writeFile(wb,'Bidfood_Emiratization.xlsx');
+  } else if(fmt==='csv'){
+    const ws=XLSX.utils.json_to_sheet(buildRows(data));
+    const blob=new Blob([XLSX.utils.sheet_to_csv(ws)],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='Bidfood_Emiratization.csv'; a.click();
+  } else if(fmt==='pdf'){
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'landscape'});
+    doc.setFontSize(14); doc.text('Bidfood — Emiratization Tracking',14,14);
+    doc.autoTable({
+      head:[['Name','Company','Dept','Emirates ID','Contact','Hiring Date','6M Completion','Status']],
+      body:data.map(e=>[e.name,e.company,e.department,e.eid||'—',e.contact,e.hiringDate||'—',e.completionDate||'—',e.statusLabel]),
+      startY:20,styles:{fontSize:7},headStyles:{fillColor:[10,31,68]}
+    });
+    doc.save('Bidfood_Emiratization.pdf');
+  }
+  toast(t('exportOk'));
+}
+
+/* ---- Edit Modal ---- */
+let editingSn = null;
+
+function openEdit(sn){
+  const e = employees.find(x=>x.sn===sn);
+  if(!e) return;
+  editingSn = sn;
+
+  document.getElementById('editAv').textContent = initials(e.name);
+  document.getElementById('editName').textContent = e.name;
+  document.getElementById('editSub').textContent = `${e.department} · ${e.company}`;
+  document.getElementById('editEid').value = e.eid||'';
+  document.getElementById('editContact').value = e.contact||'';
+  document.getElementById('editHiring').value = e.hiringDate||'';
+  document.getElementById('editCompletion').value = e.completionDate||'';
+
+  // Status radio highlight
+  document.querySelectorAll('.status-radio').forEach(btn=>{
+    btn.className = 'status-radio';
+    if(btn.dataset.val === e.status) btn.classList.add(`selected-${e.status}`);
+  });
+
+  // Retranslate labels inside modal
+  document.querySelectorAll('#editModal [data-i18n]').forEach(el=>{ el.textContent=t(el.getAttribute('data-i18n')); });
+
+  document.getElementById('editModal').classList.add('open');
+}
+
+document.querySelectorAll('.status-radio').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.status-radio').forEach(b=>b.className='status-radio');
+    btn.classList.add(`selected-${btn.dataset.val}`);
+  });
+});
+
+document.getElementById('editModalClose').onclick = ()=> document.getElementById('editModal').classList.remove('open');
+document.getElementById('cancelEditBtn').onclick   = ()=> document.getElementById('editModal').classList.remove('open');
+document.getElementById('editModal').onclick = ev=>{ if(ev.target.id==='editModal') ev.target.classList.remove('open'); };
+
+document.getElementById('saveEditBtn').onclick = ()=>{
+  const e = employees.find(x=>x.sn===editingSn);
+  if(!e) return;
+
+  const selectedRadio = document.querySelector('.status-radio[class*="selected-"]');
+  if(selectedRadio) e.status = selectedRadio.dataset.val;
+
+  const statusLabels = { Completed:'✓ Completed 6 Months', Pending:'Pending', Inactive:'Inactive' };
+  const statusLabelsAr = { Completed:'✓ أكمل 6 أشهر', Pending:'قيد الانتظار', Inactive:'غير نشط' };
+  e.statusLabel = lang==='ar' ? statusLabelsAr[e.status] : statusLabels[e.status];
+
+  e.eid        = document.getElementById('editEid').value.trim();
+  e.contact    = document.getElementById('editContact').value.trim();
+  e.hiringDate = document.getElementById('editHiring').value;
+  e.completionDate = document.getElementById('editCompletion').value;
+
+  document.getElementById('editModal').classList.remove('open');
+  renderAll();
+  toast(t('saveOk'));
+};
+function toast(msg,type='success'){
+  const el=document.createElement('div');
+  el.className=`toast-item ${type}`;
+  el.innerHTML=`<i class="fa-solid ${type==='success'?'fa-circle-check':'fa-circle-exclamation'}"></i><span>${msg}</span>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>el.remove(),3500);
+}
+
+/* ---- Init ---- */
+applyLang('en');
+</script>
+</body>
+</html>
